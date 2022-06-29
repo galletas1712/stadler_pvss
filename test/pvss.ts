@@ -54,15 +54,29 @@ describe("PVSS", () => {
       // Share bogus PK first
       const bogusPK = ethers.utils.randomBytes(BITS / 8);
       await (await PVSSContract.connect(committee[i]).sharePK(bogusPK)).wait();
-      expect(await PVSSContract.remainingPKsToSet()).to.equal(committee.length - i - 1);
-      expect(await PVSSContract.committeeMemberSetPK(committee[i].address)).to.equal(true);
-      expect(await PVSSContract.committeePKs(committee[i].address)).to.equal(bogusPK);
+      expect(await PVSSContract.remainingPKsToSet()).to.equal(
+        committee.length - i - 1
+      );
+      expect(
+        await PVSSContract.committeeMemberSetPK(committee[i].address)
+      ).to.equal(true);
+      expect(await PVSSContract.committeePKs(committee[i].address)).to.equal(
+        bogusPK
+      );
 
       // Share actual PK
-      await (await PVSSContract.connect(committee[i]).sharePK(publicKeys[i])).wait();
-      expect(await PVSSContract.remainingPKsToSet()).to.equal(committee.length - i - 1);
-      expect(await PVSSContract.committeeMemberSetPK(committee[i].address)).to.equal(true);
-      expect(await PVSSContract.committeePKs(committee[i].address)).to.equal(publicKeys[i]);
+      await (
+        await PVSSContract.connect(committee[i]).sharePK(publicKeys[i])
+      ).wait();
+      expect(await PVSSContract.remainingPKsToSet()).to.equal(
+        committee.length - i - 1
+      );
+      expect(
+        await PVSSContract.committeeMemberSetPK(committee[i].address)
+      ).to.equal(true);
+      expect(await PVSSContract.committeePKs(committee[i].address)).to.equal(
+        publicKeys[i]
+      );
     }
   });
 });
