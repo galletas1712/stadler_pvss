@@ -23,7 +23,13 @@ describe("PVSS", () => {
     secretKeys = committee.map(() =>
       BigNumber.from(ethers.utils.randomBytes(BITS / 8)).mod(Q)
     );
-    publicKeys = secretKeys.map((sk) => bigNumModExp(H, sk, P));
+    publicKeys = secretKeys.map((sk) =>
+      bigNumModExp(
+        BigNumber.from(H.toString()),
+        sk,
+        BigNumber.from(P.toString())
+      )
+    );
   });
 
   it("Should correctly instantiate addresses corresponding to committee", async () => {

@@ -1,17 +1,23 @@
 import { BigNumber } from "ethers";
 
-export const bigNumModExp = (
-  base: BigNumber,
-  exp: BigNumber,
-  mod: BigNumber
-): BigNumber => {
-  if (exp.eq(BigNumber.from(0))) {
-    return BigNumber.from(1);
+export const bigNumModExp = (base: BigNumber, exp: BigNumber, mod: BigNumber) =>
+  BigNumber.from(
+    modExp(
+      BigInt(base.toString()),
+      BigInt(exp.toString()),
+      BigInt(mod.toString())
+    ).toString()
+  );
+
+const modExp = (base: bigint, exp: bigint, mod: bigint): bigint => {
+  if (exp === 0n) {
+    return 1n;
   }
-  if (exp.eq(BigNumber.from(1))) {
+  if (exp === 1n) {
     return base;
   }
-  return bigNumModExp(base.mul(base).mod(mod), exp.div(2), mod)
-    .mul(bigNumModExp(base, exp.and(1), mod))
-    .mod(mod);
+  return (
+    (modExp((base * base) % mod, exp / 2n, mod) * modExp(base, exp & 1n, mod)) %
+    mod
+  );
 };
