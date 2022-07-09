@@ -3,7 +3,7 @@ import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { BITS, COMMITTEE_SIZE, P } from "./constants";
-import { instantiateContract } from "./lib";
+import { instantiateContract, shareKeys } from "./lib";
 import { BigIntToHex, UInt8ToBigInt } from "./util";
 
 describe("Key Sharing", () => {
@@ -83,8 +83,31 @@ describe("Key Sharing", () => {
         PVSSContract.connect(committee[i]).sharePK(
           BigIntToHex(UInt8ToBigInt(ethers.utils.randomBytes(BITS / 8)) % P)
         )
-      ).to.be.revertedWith(i == committee.length - 1 ? "Phase is not KEY_COLLECTION" : "Already set public key");
+      ).to.be.revertedWith(
+        i == committee.length - 1
+          ? "Phase is not KEY_COLLECTION"
+          : "Already set public key"
+      );
     }
     expect(await PVSSContract.phase()).to.equal(1);
+  });
+
+  it("Should behave correctly after calling shareKeys from client", async () => {
+    await shareKeys(PVSSContract, committee, publicKeys);
+    expect(await PVSSContract.remainingToSet()).to.equal(0);
+    expect(await PVSSContract.phase()).to.equal(1);
+    for (let i = 0; i < committee.length; i++) {
+      expect(await PVSSContract.committeePKs(i)).to.equal(
+        BigIntToHex(publicKeys[i])
+      );
+      expect(
+        await PVSSContract.committeeMemberSet(committee[i].address)
+      ).to.equal(true);
+      await expect(
+        PVSSContract.connect(committee[i]).sharePK(
+          BigIntToHex(UInt8ToBigInt(ethers.utils.randomBytes(BITS / 8)) % P)
+        )
+      ).to.be.revertedWith("Phase is not KEY_COLLECTION");
+    }
   });
 });
