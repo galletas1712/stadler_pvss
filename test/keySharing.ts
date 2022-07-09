@@ -59,7 +59,7 @@ describe("Key Sharing", () => {
     ).to.be.revertedWith("msg.sender not in committee");
   });
 
-  it("Should only allow committee members to send public keys once", async () => {
+  it("Should only allow committee members to send public keys once and change phase at the end", async () => {
     for (let i = 0; i < committee.length; i++) {
       expect(
         await PVSSContract.committeeMemberSet(committee[i].address)
@@ -85,5 +85,6 @@ describe("Key Sharing", () => {
         )
       ).to.be.revertedWith(i == committee.length - 1 ? "Phase is not KEY_COLLECTION" : "Already set public key");
     }
+    expect(await PVSSContract.phase()).to.equal(1);
   });
 });
